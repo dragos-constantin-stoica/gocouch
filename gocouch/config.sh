@@ -12,6 +12,8 @@
 export GOPATH=`pwd`
 
 git clone https://github.com/boltdb/bolt.git ./src/github.com/boltdb/bolt
+git clone https://github.com/labstack/echo.git ./src/github.com/labstack/echo
+git clone https://github.com/labstack/gommon.git ./src/github.com/labstack/gommon
 git clone https://github.com/mattn/go-colorable.git ./src/github.com/mattn/go-colorable
 git clone https://github.com/mattn/go-isatty.git ./src/github.com/mattn/go-isatty
 git clone https://github.com/golang/net.git ./src/github.com/x/net
