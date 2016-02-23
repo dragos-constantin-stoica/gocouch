@@ -16,9 +16,9 @@ git clone https://github.com/labstack/echo.git ./src/github.com/labstack/echo
 git clone https://github.com/labstack/gommon.git ./src/github.com/labstack/gommon
 git clone https://github.com/mattn/go-colorable.git ./src/github.com/mattn/go-colorable
 git clone https://github.com/mattn/go-isatty.git ./src/github.com/mattn/go-isatty
-git clone https://github.com/golang/net.git ./src/github.com/x/net
-git clone https://github.com/golang/crypto.git ./src/github.com/x/crypto
-git clone https://github.com/golang/text.git ./src/github.com/x/text
+git clone https://github.com/golang/net.git ./src/golang.org/x/net
+git clone https://github.com/golang/crypto.git ./src/golang.org/x/crypto
+git clone https://github.com/golang/text.git ./src/golang.org/x/text
 
 go build
 ./gocouch
