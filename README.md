@@ -40,3 +40,16 @@ The following REST API are implemented or on the roadmap:
 - [ ] `POST http://server:5984/{db}/_ensure_full_commit `  
 
 Database log is directed to the console in this moment but this will be changed for production release, it will most probably be directed toward a file or a database. There is a config database `_gcfg.bd`, in a future version it will be an API that will allow configuration management. Attachments are also on the roadmap, both as document attachments and as CouchApps.
+
+
+Information sources
+====
+
+* http://docs.couchdb.org/en/stable/replication/protocol.html
+* https://git-wip-us.apache.org/repos/asf?p=couchdb.git;a=blob;f=src/couch_replicator/src/couch_replicator_utils.erl;h=d7778db;hb=HEAD
+* https://media.readthedocs.org/pdf/couchdb/latest/couchdb.pdf
+* http://dataprotocols.org/couchdb-replication/
+* https://github.com/rcouch/rcouch/wiki/Replication-Algorithm
+* http://www.replication.io/databases
+ 
+
