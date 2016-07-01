@@ -2,7 +2,7 @@
 
 # gocouch
 CouchDB implementation in Go. The main target platform is for mobile devices.  
-The name is not final, it represents a concatenation of Go and Couch. We are still thinking to call it Gr0_0uchO DB, and add a mustache on a CouchDB logo.  
+The name is not final, it represents a concatenation of Go and Couch. We are still thinking to call it Gr0_0uchO DB, and add a mustache on a CouchDB logo. Another names on the list: Recamier, SquaBD, seTTes (a palindromized form of settee and pronounced [si tɪts]), Banquette , all refering to couch in English. The tanslation/equivalent word in other languages: gogol, bedi DB, MoengaDB (just to annoy mongoDB fans), mag-abang DB.  
 This project is not another implementation of CouchDB system. It came as an alternative to existing implementations: PouchDB, CouchBase Lite, TouchDB etc for mobile devices.
 The main purpose is to allow a decent storage mechanism of data on mobile devices that will be able to replicate/sync with a CouchDB sever. 
 By its nature GocouchDB runs off-line, stores data in JSON format and exposes a REST API to the application, and most important it syncs.
