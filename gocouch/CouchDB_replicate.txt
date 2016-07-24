@@ -1,0 +1,139 @@
+POST /_replicate
+
+{
+	source: "[string]",
+	target: "[string]",
+	create_target: boolean,
+	doc_ids: [array of IDs of documents to be replicated],
+	filter: "[ddoc_name/filter_name]" | { "filter_function":"function_body"},
+	query_params: {"param":"value"}
+	
+}
+
+create_target (boolean) – Creates the target database. Required administrator’s privileges on target server. A value of true tells the replicator to create the target database if it doesn't exist yet.
+doc_ids (array) – Array of document IDs to be synchronized,if given, only these documents will be replicated.
+proxy (string) – Address of a proxy server through which replication should occur (protocol can be “http” or “socks5”)
+source (string) – Required. Identifies the database to copy revisions from. Can be a string containing a local database name or a remote database URL, or an object whose url property contains the database name or URL.
+target (string) – Required. Identifies the database to copy revisions to. Same format and interpretation as source.
+cancel (boolean) - Include this property with a value of true to cancel an existing replication between the specified source and target.
+continuous (boolean) - A value of true makes the replication continuous (see below for details.)
+filter (string | object)- Name of a filter function that can choose which revisions get replicated or the object defining the filter function
+proxy (string) - Proxy server URL.
+query_params (JSON) - Object containing properties that are passed to the filter function.
+use_checkpoints (boolean) -	Whether to use replication checkpoints or not
+checkpoint_interval (int) - Specifies the checkpoint interval in ms.
+
+special case of view used as a filter
+{
+	...
+	filter: "_view",
+	view: "[ddoc_name/view_name]"	
+	...
+}
+
+Response
+
+There are several possible responses, most of them error messages, and a couple of OK messages.
+The error messages are thrown in various phases of replication algorithm as a direct consequence of 
+responses recieved from source or destination databases.
+
+HTTP/1.1 500 Internal Server Error
+Cache-Control: must-revalidate
+Content-Length: 56
+Content-Type: application/json
+Date: Sat, 05 Oct 2013 08:55:29 GMT
+Server: CouchDB (Erlang OTP)
+
+{
+    "error": "db_not_found",
+    "reason": "could not open source"
+}
+
+
+HTTP/1.1 500 Internal Server Error
+Cache-Control: must-revalidate
+Content-Length: 108
+Content-Type: application/json
+Date: Fri, 09 May 2014 13:50:32 GMT
+Server: CouchDB (Erlang OTP)
+
+{
+    "error": "unauthorized",
+    "reason": "unauthorized to access or create database http://localhost:5984/target"
+}
+
+
+...
+
+>>> TO BE CONTINUED <<<
+
+================================================================================
+
+HEAD /{source_db}
+
+if (404 Not Found) -> Throw(500 Internal Server Error)
+
+================================================================================
+
+HEAD /{target_db}
+
+if (404 Not Found) then
+    if (create_target) -> PUT /{target_db}
+    else -> Throw(500 Internal Server Error)
+
+================================================================================
+
+PUT /{target_db}
+
+if (401 Unauthorized | 403 Forbidden) -> Throw(500 Internal Server Error)
+
+================================================================================
+
+GET /{source_db}
+
+GET /{target_db}
+
+ {
+    "committed_update_seq": 292786,
+    "compact_running": false,
+    "data_size": 65031503,
+    "db_name": "receipts",
+    "disk_format_version": 6,
+    "disk_size": 137433211,
+    "doc_count": 6146,
+    "doc_del_count": 64637,
+    "purge_seq": 0,
+    "instance_start_time": "1376269325408900",
+    "update_seq": 292786
+ }
+
+instance_start_time (string): Timestamp when the Database was opened, expressed in microseconds since the epoch.
+update_seq (number / string): The current database Sequence ID.
+
+if (404 Not Found) -> Throw(500 Internal Server Error)
+
+================================================================================
+
+func GenerateReplicationID( ... ) ReplicationUUID
+
+server_uuid - Persistent Peer UUID value. For CouchDB, the local Server UUID is used
+source_db, target_db - Source and Target URI and if Source or Target are local or remote Databases
+create_target - If Target needed to be created
+continuous - If Replication is Continuous
+??? - OAuth headers if any
+??? - Any custom headers
+filter, query_params - Filter function code if used
+??? - Changes Feed query parameters, if any
+
+================================================================================
+
+GET /source/_local/ReplicationUUID
+
+if (404 Not Found) -> PUT /source/_local/ReplicationUUID
+
+
+
+
+
+
+
