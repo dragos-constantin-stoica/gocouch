@@ -1,0 +1,320 @@
+# CouchDB API DOC
+
+|    Route                              |      METHOD     |
+|---------------------------------------|-----------------|
+|      /                                |        GET      |
+| Response ||
+
+```http
+HTTP/1.1 200 OK
+Cache-Control: must-revalidate
+Content-Length: 179
+Content-Type: application/json
+Date: Sat, 10 Aug 2013 06:33:33 GMT
+Server: CouchDB (Erlang/OTP)
+
+{
+"couchdb": "Welcome",
+"uuid": "85fb71bf700c17267fef77535820e371",
+"vendor": {
+    "name": "The Apache Software Foundation",
+    "version": "1.3.1"
+},
+"version": "1.3.1"
+}
+```
+
+|    Route                              |      METHOD     |
+|---------------------------------------|-----------------|
+|       /_uuids                         |         GET     |
+|   Response ||
+
+```http
+HTTP/1.1 200 OK
+Content-Length: 362
+Content-Type: application/json
+Date: Sat, 10 Aug 2013 11:46:25 GMT
+ETag: "DGRWWQFLUDWN5MRKSLKQ425XV"
+Expires: Fri, 01 Jan 1990 00:00:00 GMT
+Pragma: no-cache
+Server: CouchDB (Erlang/OTP)
+
+{
+    "uuids": [
+        "75480ca477454894678e22eec6002413",
+        "75480ca477454894678e22eec600250b",
+        "75480ca477454894678e22eec6002c41",
+        "75480ca477454894678e22eec6003b90",
+        "75480ca477454894678e22eec6003fca",
+        "75480ca477454894678e22eec6004bef",
+        "75480ca477454894678e22eec600528f",
+        "75480ca477454894678e22eec6005e0b",
+        "75480ca477454894678e22eec6006158",
+        "75480ca477454894678e22eec6006161"
+    ]
+}
+```
+
+|    Route                              |      METHOD     |
+|---------------------------------------|-----------------|
+| /`^[a-z][a-z0-9_$()+/-]*$` <br/> database operations   |     HEAD        |
+| Response  | |
+
+```http
+ HTTP/1.1 200 OK
+ Server: CouchDB/1.6.1 (Erlang OTP/R16B02)
+ Date: Tue, 19 Jan 2016 12:34:30 GMT
+ Content-Type: text/plain; charset=utf-8
+ Content-Length: 240
+ Cache-Control: must-revalidate
+
+
+ HTTP/1.1 404 Object Not Found
+ Server: CouchDB/1.6.1 (Erlang OTP/R16B02)
+ Date: Tue, 19 Jan 2016 12:37:44 GMT
+ Content-Type: text/plain; charset=utf-8
+ Content-Length: 44
+ Cache-Control: must-revalidate
+```
+
+|    Route                              |      METHOD     |
+|---------------------------------------|-----------------|
+| /`^[a-z][a-z0-9_$()+/-]*$` <br/> database operations   |     PUT         |
+|	Response ||
+```http
+ HTTP/1.1 201 Created
+ Cache-Control: must-revalidate
+ Content-Length: 12
+ Content-Type: application/json
+ Date: Mon, 12 Aug 2013 08:01:45 GMT
+ Location: http://localhost:5984/db
+ Server: CouchDB (Erlang/OTP)
+
+ {
+    "ok": true
+ }
+
+ HTTP/1.1 412 Precondition Failed
+ Cache-Control: must-revalidate
+ Content-Length: 95
+ Content-Type: application/json
+ Date: Mon, 12 Aug 2013 08:01:16 GMT
+ Server: CouchDB (Erlang/OTP)
+
+ {
+    "error": "file_exists",
+    "reason": "The database could not be created, the file already exists."
+ }
+
+ HTTP/1.1 400 Bad Request
+ Cache-Control: must-revalidate
+ Content-Length: 194
+ Content-Type: application/json
+ Date: Mon, 12 Aug 2013 08:02:10 GMT
+ Server: CouchDB (Erlang/OTP)
+
+ {
+    "error": "illegal_database_name",
+    "reason": "Name: '_db'. Only lowercase characters (a-z), digits (0-9), and any of the characters _, $, (, ), +, -, and / are allowed. Must begin with a letter."
+ }
+```
+
+|    Route                              |      METHOD     |
+|---------------------------------------|-----------------|
+| /`^[a-z][a-z0-9_$()+/-]*$` <br/> database operations | POST |
+| Response | |
+
+```http
+ HTTP/1.1 201 Created
+ Cache-Control: must-revalidate
+ Content-Length: 95
+ Content-Type: application/json
+ Date: Tue, 13 Aug 2013 15:19:25 GMT
+ ETag: "1-9c65296036141e575d32ba9c034dd3ee"
+ Location: http://localhost:5984/db/ab39fe0993049b84cfa81acd6ebad09d
+ Server: CouchDB (Erlang/OTP)
+
+ {
+    "id": "ab39fe0993049b84cfa81acd6ebad09d",
+    "ok": true,
+    "rev": "1-9c65296036141e575d32ba9c034dd3ee"
+ }
+
+ HTTP/1.1 404 Object Not Found
+ Server: CouchDB/1.6.1 (Erlang OTP/R16B02)
+ Date: Wed, 20 Jan 2016 09:18:46 GMT
+ Content-Type: text/plain; charset=utf-8
+ Content-Length: 44
+ Cache-Control: must-revalidate
+
+ {
+	"error":"not_found",
+	"reason":"no_db_file"
+ }
+
+ HTTP/1.1 400 Bad Request
+ Server: CouchDB/1.6.1 (Erlang OTP/R16B02)
+ Date: Wed, 20 Jan 2016 09:22:23 GMT
+ Content-Type: text/plain; charset=utf-8
+ Content-Length: 196
+ Cache-Control: must-revalidate
+
+ {
+	"error":"illegal_database_name",
+	"reason":"Name: '3pufi'. Only lowercase characters (a-z), digits (0-9), and any of the characters _, $, (, ), +, -, and / are allowed. Must begin with a letter."
+ }
+
+ HTTP/1.1 409 Conflict
+ Server: CouchDB/1.6.1 (Erlang OTP/R16B02)
+ Date: Wed, 20 Jan 2016 09:29:49 GMT
+ Content-Type: text/plain; charset=utf-8
+ Content-Length: 58
+ Cache-Control: must-revalidate
+
+ {
+	"error":"conflict",
+	"reason":"Document update conflict."
+ }
+```
+
+|    Route                              |      METHOD     |
+|---------------------------------------|-----------------|
+| /`^[a-z][a-z0-9_$()+/-]*$` <br/> database operations |  DELETE      |
+|	Response ||
+
+```http
+ HTTP/1.1 200 OK
+ Cache-Control: must-revalidate
+ Content-Length: 12
+ Content-Type: application/json
+ Date: Mon, 12 Aug 2013 08:54:00 GMT
+ Server: CouchDB (Erlang/OTP)
+
+ {
+    "ok": true
+ }
+
+ HTTP/1.1 400 Bad Request
+ Server: CouchDB/1.6.1 (Erlang OTP/R16B02)
+ Date: Wed, 20 Jan 2016 14:10:00 GMT
+ Content-Type: text/plain; charset=utf-8
+ Content-Length: 133
+ Cache-Control: must-revalidate
+
+ {
+	"error":"bad_request",
+	"reason":"You tried to DELETE a database with a ?rev= parameter. Did you mean to DELETE a document instead?"
+ }
+
+ HTTP/1.1 404 Object Not Found
+ Server: CouchDB/1.6.1 (Erlang OTP/R16B02)
+ Date: Wed, 20 Jan 2016 14:12:21 GMT
+ Content-Type: text/plain; charset=utf-8
+ Content-Length: 41
+ Cache-Control: must-revalidate
+
+ {
+	"error":"not_found",
+	"reason":"missing"
+ }
+```
+
+|    Route                              |      METHOD     |
+|---------------------------------------|-----------------|
+| /`^[a-z][a-z0-9_$()+/-]*$` <br/> database operations |     GET         |
+| Response ||
+
+```http
+ HTTP/1.1 200 OK
+ Cache-Control: must-revalidate
+ Content-Length: 258
+ Content-Type: application/json
+ Date: Mon, 12 Aug 2013 01:38:57 GMT
+ Server: CouchDB (Erlang/OTP)
+
+ {
+    "committed_update_seq": 292786,
+    "compact_running": false,
+    "data_size": 65031503,
+    "db_name": "receipts",
+    "disk_format_version": 6,
+    "disk_size": 137433211,
+    "doc_count": 6146,
+    "doc_del_count": 64637,
+    "instance_start_time": "1376269325408900",
+    "purge_seq": 0,
+    "update_seq": 292786
+ }
+```
+
+|    Route                              |      METHOD     |
+|---------------------------------------|-----------------|
+|    /_backup/`^[a-z][a-z0-9_$()+/-]*$` <br/> database backup | GET |
+| Response ||
+
+```http
+ HTTP/1.1 200 OK
+ Content-Disposition: attachment; filename="test.bd"
+ Content-Length: 24576
+ Content-Type: application/octet-stream
+ Server: Gouch (Go)
+ Date: Wed, 20 Jan 2016 15:40:51 GMT
+
+[message-body; type:application/octet-stream, size:24576 bytes]
+
+
+ HTTP/1.1 404 Not Found
+ Cache-Control: must-revalidate
+ Content-Type: application/json; charset=utf-8
+ Server: Gouch (Go)
+ Date: Wed, 20 Jan 2016 15:39:52 GMT
+ Content-Length: 55
+
+ {
+	"error":"not_found",
+	"reason":"Missing database file!"
+ }
+```
+
+|    Route                              |      METHOD     |
+|---------------------------------------|-----------------|
+|      /{db}/{docid} <br/> document operations, no attachments |     HEAD      <br/> GET <br/>  PUT <br/> DELETE      |
+
+|    Route                              |      METHOD     |
+|---------------------------------------|-----------------|
+|      /{db}/{docid}/{attachment} <br/>	document attachments only | HEAD <br/>   GET  <br/> PUT <br/> DELETE      |
+
+|    Route                              |      METHOD     |
+|---------------------------------------|-----------------|
+|        /_replicate <br/>  see official documentation!!!                 |     POST        |
+
+|    Route                              |      METHOD     |
+|---------------------------------------|-----------------|
+|        /{db}/_compact                 |     POST        |
+
+|    Route                              |      METHOD     |
+|---------------------------------------|-----------------|
+|       /{db}/_purge                    |     POST        |
+|                                       |                 |
+
+|    Route                              |      METHOD     |
+|---------------------------------------|-----------------|
+|       /_all_dbs                       |     GET         |
+|  Response ||
+
+```http 
+  HTTP/1.1 200 OK
+  Cache-Control: must-revalidate
+  Content-Length: 52
+  Content-Type: application/json
+  Date: Sat, 10 Aug 2013 06:57:48 GMT
+  Server: CouchDB (Erlang/OTP)
+
+  [
+   "_users",
+   "contacts",
+   "docs",
+   "invoices",
+   "locations"
+  ]
+```

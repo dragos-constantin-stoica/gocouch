@@ -2,17 +2,18 @@
 package Internals
 
 import (
-	"os"
-	"crypto/rand"
 	"crypto/md5"
+	"crypto/rand"
 	"encoding/hex"
 	_ "fmt"
-	"github.com/boltdb/bolt"
-	"github.com/labstack/echo"
 	"io"
 	"log"
-	"time"
+	"os"
 	"strconv"
+	"time"
+
+	"github.com/coreos/bbolt"
+	"github.com/labstack/echo"
 )
 
 const (
@@ -21,8 +22,8 @@ const (
 )
 
 func GetMD5Hash(text []byte) string {
-   hash := md5.Sum(text)
-   return hex.EncodeToString(hash[:])
+	hash := md5.Sum(text)
+	return hex.EncodeToString(hash[:])
 }
 
 func GetUUID() string {
@@ -96,7 +97,7 @@ func (b *BoltDB) UpdateDB(bucket []byte, key []byte, value []byte) error {
 	})
 }
 
-func (b *BoltDB) ExistsDoc(bucket []byte) bool{
+func (b *BoltDB) ExistsDoc(bucket []byte) bool {
 	var result = false
 	b.db.View(func(tx *bolt.Tx) error {
 		bucket_tmp := tx.Bucket(bucket)
@@ -106,17 +107,17 @@ func (b *BoltDB) ExistsDoc(bucket []byte) bool{
 	return result
 }
 
-func DeleteDB(filepath string, dbname string) error{
+func DeleteDB(filepath string, dbname string) error {
 	return os.Remove(filepath + dbname)
 }
 
-func (b *BoltDB) ExportFile(dbname string, c *echo.Context ) error {
+func (b *BoltDB) ExportFile(dbname string, c echo.Context) error {
 	err := b.db.View(func(tx *bolt.Tx) error {
-        c.Response().Header().Set(echo.ContentType, "application/octet-stream")
-        c.Response().Header().Set("Content-Disposition", `attachment; filename="`+dbname+`"`)
-        c.Response().Header().Set("Content-Length", strconv.Itoa(int(tx.Size())))
-        _, err := tx.WriteTo(c.Response().Writer())
-        return err
-    })
+		c.Response().Header().Set(echo.HeaderContentType, "application/octet-stream")
+		c.Response().Header().Set("Content-Disposition", `attachment; filename="`+dbname+`"`)
+		c.Response().Header().Set("Content-Length", strconv.Itoa(int(tx.Size())))
+		_, err := tx.WriteTo(c.Response().Writer())
+		return err
+	})
 	return err
 }
