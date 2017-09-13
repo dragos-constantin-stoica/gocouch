@@ -12,13 +12,13 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/coreos/bbolt"
+	"github.com/boltdb/bolt"
 	"github.com/labstack/echo"
 )
 
 const (
 	WelcomeMsg = "GO CouchDB started ... everybody relax, NOW!"
-	ServerMsg  = "Gouch (Go)"
+	ServerMsg  = "GouchDB (Go)"
 )
 
 func GetMD5Hash(text []byte) string {

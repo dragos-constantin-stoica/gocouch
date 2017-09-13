@@ -17,12 +17,14 @@ The REST API is assured by echo framework (http://labstack.com/echo and https://
 Some of golang extra packages are needed: net, crypto and text. You may get them from: https://github.com/golang add them to the src directory.
 
 Or after cloning the repository onto your local drive,   
-`cd gocouch/gocouch; chmod 0777 ./config.sh`  
+`cd gocouch/gocouch; chmod 0777 ./build.sh`  
 you may run the following script for setup:  
-`config.sh`  
+`./build.sh`  
 If you get this message:  
 `INFO|echo| GO CouchDB started ... everybody relax, NOW!`  
 then you are up and running, congratulations!
+
+If you want develop your own version of this software, please use `./build.sh clean` before commit.
 
 # 1. Development Status
 The following REST API are implemented or on the roadmap:  
