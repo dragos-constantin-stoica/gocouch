@@ -40,7 +40,7 @@ var (
 func init() {
 	GoCouchCFG.GoCouch.UUID = Internals.GetUUID()
 	GoCouchCFG.HTTPd.Bind_Address = "127.0.0.1"
-	GoCouchCFG.HTTPd.Port = "5984"
+	GoCouchCFG.HTTPd.Port = "5335"
 
 }
 

@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <link rel="stylesheet" href="https://unpkg.com/mermaid@7.0.3/dist/mermaid.min.css">
+</head>
+<body>
+  <h1>CouchDB Replicate Protocol Sequence Diagram</h1>
+  <h2>Glossary</h2>
+  <dl>
+      <dt>Source:</dt>
+      <dd>Database from where the Documents are replicated.</dd>
+      <dt>Target:</dt>
+      <dd>Database where the Documents are replicated to.</dd>
+      <dt>Changes Feed:</dt>
+      <dd>A stream of Document-changing events (create, update, delete) 
+        for the specified Database.</dd>
+      <dt>Replication:</dt>
+      <dd>The one-way directed synchronization process of
+          Source and Target endpoints.</dd>
+      <dt>Checkpoint:</dt>
+      <dd>Intermediate Recorded Sequence ID used for Replication recovery.</dd>
+      <dt>Replicator:</dt>
+      <dd>A service or an application which initiates and runs Replication.</dd>
+      <dt>Filtered Replication:</dt>
+      <dd>Replication of Documents from Source to Target 
+        using a Filter Function.</dd>
+      <dt>Full Replication:</dt>
+      <dd>Replication of all Documents from Source to Target.</dd>
+      <dt>Pull Replication</dt>
+      <dd>
+          Replication process where
+          Source is a remote endpoint 
+          and Target is local.
+      </dd>
+      <dt>Push Replication</dt>
+      <dd>
+          Replication process where
+          Source is a local endpoint
+          and Target is remote.
+      </dd>
+      <dt>Continuous Replication</dt>
+      <dd>
+          Replication that “never stops”: 
+          after processing all events from the Changes Feed, 
+          the Replicator doesn’t close the connection, 
+          but awaits new change events from the Source. 
+          The connection is kept alive by periodic heartbeats.
+      </dd>
+    </dl>
+  <h2>Case 0. 200 OK</h2>
+  <div class="mermaid">
+    sequenceDiagram
+      HTML Client->>+GoCouchDB: POST /_replicate
+      Note right of GoCouchDB: Replication request successfully completed     
+      GoCouchDB-->>-HTML Client: 200 OK 
+  </div>
+  <h3>The algorithm</h3>
+  <p>The payload
+  <code>
+  {
+   "source": "local_source_db",
+   "target": "local_target_db",
+   "create_target" : true
+  }
+  </code>.
+  </p>
+  <pre>
+    HEAD /{source_db}
+    HEAD /{target_db}
+      PUT /{target_db}
+
+    GET /{source_db}
+    GET /{target_db}
+    
+    replication_id := generate_replicatoin_id()
+    GET /{source_db}/_local/replication_id 
+      PUT /{source_db}/_local/replication_id 
+    GET /{target_db}/_local/replication_id 
+      PUT /{target_db}/_local/replication_id 
+    
+  </pre>
+  <p>0. Check the existence of source database</p>
+  <div class="mermaid">
+      sequenceDiagram
+        participant S as GoCouchDB
+        participant T as Source CouchDB
+        Note left of T: Check if the source database exists         
+        S->>T: HEAD /:{db}
+        alt {db} exists
+            T->>S: 200 OK
+        else {db} does no exist
+            T->>S: 404 Not Found
+        end
+    </div>   
+  <p>If response is <code>404 Not Found</code> then apply <em>Case 4.</em> 
+  </p>
+ 
+  <p>1. Check the existence of target database</p>
+  <div class="mermaid">
+      sequenceDiagram
+        participant S as GoCouchDB
+        participant T as Target CouchDB
+        Note left of T: Check if the target database exists         
+        S->>T: HEAD /:{db}
+        alt {db} exists
+            T->>S: 200 OK
+        else {db} does no exist
+            T->>S: 404 Not Found
+        end
+    </div>   
+  <p>If response is <code>404 Not Found</code> and 
+    <code>create_target is not true</code> then apply <em>Case 4.</em> else create the target database.
+  </p>
+  
+ 
+  <p>1.1 Create target database</p>
+  <div class="mermaid">
+      sequenceDiagram
+        participant S as GoCouchDB
+        participant T as Target CouchDB
+        Note left of T: Check the response from PUT         
+        S->>T: PUT /:{db}
+        alt {db} does not exist
+            T->>S: 201 Created
+        else {db} exists
+            T->>S: 400 Bad Request
+            T->>S: 401 Unauthorized
+            T->>S: 412 Precondition Failed
+        end
+    </div>   
+  <p>If response is <code>400 Bad Request</code> 
+    then apply <em>Case 2.</em></p>
+  <p>If response is <code>401 Unauthorized</code> 
+    then apply <em>Case 3.</em></p>
+  <p>If response is <code>412 Precondition Failed</code> 
+    then apply <em>Case 5.</em></p>
+
+
+
+  <h2>Case 1. 202 Accepted</h2>
+  <div class="mermaid">
+    sequenceDiagram
+      HTML Client->>+GoCouchDB: POST /_replicate
+      Note right of GoCouchDB: Continuous replication request has been accepted     
+      GoCouchDB-->>-HTML Client: 202 Accepted 
+  </div> 
+  <h2>Case 2. 400 Bad Request</h2>
+  <div class="mermaid">
+    sequenceDiagram
+      HTML Client->>+GoCouchDB: POST /_replicate
+      Note right of GoCouchDB: Invalid JSON data     
+      GoCouchDB-->>-HTML Client: 400 Bad Request 
+  </div>  
+  <h2>Case 3. 401 Unauthorized</h2>
+  <div class="mermaid">
+    sequenceDiagram
+      HTML Client->>+GoCouchDB: POST /_replicate
+      Note right of GoCouchDB:  CouchDB Server Administrator privileges required     
+      GoCouchDB-->>-HTML Client: 401 Unauthorized 
+  </div>  
+  <h2>Case 4. 404 Not Found</h2>
+  <div class="mermaid">
+    sequenceDiagram
+      HTML Client->>+GoCouchDB: POST /_replicate
+      Note right of GoCouchDB:  Either the source or target DB is not found or attempt to cancel unknown replication task     
+      GoCouchDB-->>-HTML Client: 404 Not Found 
+  </div> 
+  <h2>Case 5. 500 Internal Server Error</h2>
+  <div class="mermaid">
+    sequenceDiagram
+      HTML Client->>+GoCouchDB: POST /_replicate
+      Note right of GoCouchDB:  JSON specification was invalid     
+      GoCouchDB-->>-HTML Client: 500 Internal Server Error 
+  </div>     
+  <script src="https://unpkg.com/mermaid@7.0.3/dist/mermaid.min.js"></script>
+  <script>mermaid.initialize({startOnLoad:true});</script>
+</body>
+</html>

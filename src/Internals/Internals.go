@@ -9,7 +9,7 @@ import (
 	"io"
 	"log"
 	"os"
-	"strconv"
+
 	"time"
 
 	"github.com/boltdb/bolt"
@@ -111,13 +111,16 @@ func DeleteDB(filepath string, dbname string) error {
 	return os.Remove(filepath + dbname)
 }
 
-func (b *BoltDB) ExportFile(dbname string, c echo.Context) error {
-	err := b.db.View(func(tx *bolt.Tx) error {
-		c.Response().Header().Set(echo.HeaderContentType, "application/octet-stream")
-		c.Response().Header().Set("Content-Disposition", `attachment; filename="`+dbname+`"`)
-		c.Response().Header().Set("Content-Length", strconv.Itoa(int(tx.Size())))
-		_, err := tx.WriteTo(c.Response().Writer())
+func (b *BoltDB) ExportFile(filepath string, dbname string, c echo.Context) error {
+	return c.Attachment(filepath+dbname, dbname)
+	/*
+		err := b.db.View(func(tx *bolt.Tx) error {
+			c.Response().Header().Set(echo.HeaderContentType, "application/octet-stream")
+			c.Response().Header().Set("Content-Disposition", `attachment; filename="`+dbname+`"`)
+			c.Response().Header().Set("Content-Length", strconv.Itoa(int(tx.Size())))
+			_, err := tx.WriteTo(c.Response().Writer())
+			return err
+		})
 		return err
-	})
-	return err
+	*/
 }

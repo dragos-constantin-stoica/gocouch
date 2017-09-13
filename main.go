@@ -3,13 +3,13 @@
 package main
 
 import (
-	"regexp"
 	"encoding/json"
-	"net/http"
 	"io"
+	"net/http"
+	"regexp"
 
 	"github.com/labstack/echo"
- mw "github.com/labstack/echo/middleware"
+	mw "github.com/labstack/echo/middleware"
 
 	"GConfig"
 	"Internals"
@@ -17,15 +17,15 @@ import (
 )
 
 var (
-	SlashRSP *JSONStructs.SlashResponse
-	ValidDB_Name *regexp.Regexp 
-	e *echo.Echo
+	SlashRSP     *JSONStructs.SlashResponse
+	ValidDB_Name *regexp.Regexp
+	e            *echo.Echo
 
 	//DBList map[string]Internals.BoltDB
 )
 
-func slashHandler(c *echo.Context) error {
-	c.Response().Header().Set(echo.ContentType, echo.ApplicationJSON)
+func slashHandler(c echo.Context) error {
+	c.Response().Header().Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 	c.Response().Header().Set("Cache-Control", "must-revalidate")
 	c.Response().Header().Set("Server", Internals.ServerMsg)
 
@@ -33,8 +33,8 @@ func slashHandler(c *echo.Context) error {
 	return nil
 }
 
-func uuidHandler(c *echo.Context) error {
-	c.Response().Header().Set(echo.ContentType, echo.ApplicationJSON)
+func uuidHandler(c echo.Context) error {
+	c.Response().Header().Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 	c.Response().Header().Set("Cache-Control", "must-revalidate")
 	c.Response().Header().Set("Pragma", "no-cache")
 	c.Response().Header().Set("ETag", "buru-buru")
@@ -55,18 +55,18 @@ func uuidHandler(c *echo.Context) error {
 	return nil
 }
 
-func dbHeadHandler(c *echo.Context) error {
+func dbHeadHandler(c echo.Context) error {
 	db := c.Param("db")
-	
-	if Contains(ALL_DBS, db){
-		c.Response().Header().Set(echo.ContentType, echo.TextPlainCharsetUTF8)
+
+	if Contains(ALL_DBS, db) {
+		c.Response().Header().Set(echo.HeaderContentType, echo.MIMETextPlainCharsetUTF8)
 		c.Response().Header().Set("Cache-Control", "must-revalidate")
-		c.Response().Header().Set("Server", Internals.ServerMsg)		
-	}else{
-		c.Response().Header().Set(echo.ContentType, echo.TextPlainCharsetUTF8)
+		c.Response().Header().Set("Server", Internals.ServerMsg)
+	} else {
+		c.Response().Header().Set(echo.HeaderContentType, echo.MIMETextPlainCharsetUTF8)
 		c.Response().Header().Set("Cache-Control", "must-revalidate")
-		c.Response().Header().Set("Server", Internals.ServerMsg)				
-		return echo.NewHTTPError(http.StatusNotFound)		
+		c.Response().Header().Set("Server", Internals.ServerMsg)
+		return echo.NewHTTPError(http.StatusNotFound)
 	}
 
 	//json.NewEncoder(c.Response()).Encode(c.Param("db"))
@@ -75,82 +75,81 @@ func dbHeadHandler(c *echo.Context) error {
 	return nil
 }
 
-func dbPutHandler(c *echo.Context) error{
+func dbPutHandler(c echo.Context) error {
 	db := c.Param("db")
 
-	c.Response().Header().Set(echo.ContentType, echo.ApplicationJSON)
+	c.Response().Header().Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 	c.Response().Header().Set("Cache-Control", "must-revalidate")
 	c.Response().Header().Set("Server", Internals.ServerMsg)
-	
-	
-	if !ValidDB_Name.MatchString(db){
+
+	if !ValidDB_Name.MatchString(db) {
 		//the DB name is not valid -> 400
-		
+
 		InvalidDBName := &JSONStructs.DBErrorResponse{
 			ErrorMsg: "illegal_database_name",
-			Reason: "Name: '" + db + "'. Only lowercase characters (a-z), " + 
-			        "digits (0-9), and any of the characters _, $, " + 
-					"(, ), +, -, and / are allowed. Must begin with " +
-					" a letter.",
+			Reason: "Name: '" + db + "'. Only lowercase characters (a-z), " +
+				"digits (0-9), and any of the characters _, $, " +
+				"(, ), +, -, and / are allowed. Must begin with " +
+				" a letter.",
 		}
-		c.JSON(http.StatusBadRequest, InvalidDBName)		
+		c.JSON(http.StatusBadRequest, InvalidDBName)
 		return nil
 	}
-	if Contains(ALL_DBS, db){
+	if Contains(ALL_DBS, db) {
 		//the DB already exists -> 412
 		DBExists := &JSONStructs.DBErrorResponse{
 			ErrorMsg: "file_exists",
-			Reason: "The database could not be created, the file already exists.",
+			Reason:   "The database could not be created, the file already exists.",
 		}
 		c.JSON(http.StatusPreconditionFailed, DBExists)
 		return nil
 	}
 	//TODO implement database security so that 401 may be checked also
-	
+
 	//It should be OK - create the DB file and add it to ALL_DBS
 	//Send 201 response
-	
-	newDB := Internals.NewBoltDB("", db + ".bd" )
+
+	newDB := Internals.NewBoltDB("", db+".bd")
 	defer newDB.Close()
 	ALL_DBS = append(ALL_DBS, db)
-	
-	c.Response().Header().Set("Location", "http://get.server.address.or.host.name" + ":" +
-							  GConfig.GoCouchCFG.HTTPd.Port + "/" + db)
+
+	c.Response().Header().Set("Location", "http://get.server.address.or.host.name"+":"+
+		GConfig.GoCouchCFG.HTTPd.Port+"/"+db)
 	DBCreatedOK := &JSONStructs.OKResponse{
 		OK: true,
-	}	
+	}
 	c.JSON(http.StatusCreated, DBCreatedOK)
 	return nil
 }
 
-func dbPostHandler(c *echo.Context) error{
+func dbPostHandler(c echo.Context) error {
 	db := c.Param("db")
-	
+
 	//check db
 	//400 or 404 possible error
-	
-	c.Response().Header().Set(echo.ContentType, echo.ApplicationJSON)
+
+	c.Response().Header().Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 	c.Response().Header().Set("Cache-Control", "must-revalidate")
 	c.Response().Header().Set("Server", Internals.ServerMsg)
-	
-	if !ValidDB_Name.MatchString(db){
+
+	if !ValidDB_Name.MatchString(db) {
 		//the DB name is not valid -> 400
-		
+
 		InvalidDBName := &JSONStructs.DBErrorResponse{
 			ErrorMsg: "illegal_database_name",
-			Reason: "Name: '" + db + "'. Only lowercase characters (a-z), " + 
-			        "digits (0-9), and any of the characters _, $, " + 
-					"(, ), +, -, and / are allowed. Must begin with " +
-					" a letter.",
+			Reason: "Name: '" + db + "'. Only lowercase characters (a-z), " +
+				"digits (0-9), and any of the characters _, $, " +
+				"(, ), +, -, and / are allowed. Must begin with " +
+				" a letter.",
 		}
-		c.JSON(http.StatusBadRequest, InvalidDBName)		
+		c.JSON(http.StatusBadRequest, InvalidDBName)
 		return nil
 	}
-	if !Contains(ALL_DBS, db){
+	if !Contains(ALL_DBS, db) {
 		//the DB does not exist -> 404
 		DBExists := &JSONStructs.DBErrorResponse{
 			ErrorMsg: "not_found",
-			Reason: "no_db_file",
+			Reason:   "no_db_file",
 		}
 		c.JSON(http.StatusNotFound, DBExists)
 		return nil
@@ -160,146 +159,145 @@ func dbPostHandler(c *echo.Context) error{
 
 	//Get JSON payload and decode it
 	dec := json.NewDecoder(c.Request().Body)
-    var payload map[string]interface{}
-    for {
+	var payload map[string]interface{}
+	for {
 
-        if err := dec.Decode(&payload); err == io.EOF {
-            break
-        } else if err != nil {
-            e.Logger().Error("%s",err)
-        }
-        //e.Logger().Info("%s", payload["_id"])
-    }
-	
+		if err := dec.Decode(&payload); err == io.EOF {
+			break
+		} else if err != nil {
+			e.Logger.Error("%s", err)
+		}
+		//e.Logger().Info("%s", payload["_id"])
+	}
+
 	if payload["_id"] != nil {
 		//check to see if there is already a document with this id -> 409
-		tmp_db := Internals.NewBoltDB("", db + ".bd")
+		tmp_db := Internals.NewBoltDB("", db+".bd")
 		defer tmp_db.Close()
-		if tmp_db.ExistsDoc([]byte(payload["_id"].(string))){
+		if tmp_db.ExistsDoc([]byte(payload["_id"].(string))) {
 			DOCExists := &JSONStructs.DBErrorResponse{
 				ErrorMsg: "conflict",
-				Reason: "Document update conflict.",
+				Reason:   "Document update conflict.",
 			}
 			c.JSON(http.StatusConflict, DOCExists)
 			return nil
-		}else{
+		} else {
 			//create new doc with specified id
 			doc, _ := json.Marshal(payload)
-			payload["_rev"] = "1-" + Internals.GetMD5Hash(doc) 
+			payload["_rev"] = "1-" + Internals.GetMD5Hash(doc)
 			doc, _ = json.Marshal(payload)
-			
+
 			//e.Logger().Info("%s", doc)
-			
-			tmp_db.UpdateDB([]byte(payload["_id"].(string)), 
-			                []byte(payload["_rev"].(string)), 
-							[]byte(doc))
+
+			tmp_db.UpdateDB([]byte(payload["_id"].(string)),
+				[]byte(payload["_rev"].(string)),
+				[]byte(doc))
 		}
-	}else{
+	} else {
 		//create a new doc with random id
-		tmp_db := Internals.NewBoltDB("", db + ".bd")
+		tmp_db := Internals.NewBoltDB("", db+".bd")
 		defer tmp_db.Close()
 		payload["_id"] = Internals.GetUUID()
 		doc, _ := json.Marshal(payload)
-		payload["_rev"] = "1-" + Internals.GetMD5Hash(doc) 
+		payload["_rev"] = "1-" + Internals.GetMD5Hash(doc)
 		doc, _ = json.Marshal(payload)
-			
-			//e.Logger().Info("%s", doc)
-			
+
+		//e.Logger().Info("%s", doc)
+
 		tmp_db.UpdateDB([]byte(payload["_id"].(string)),
-						[]byte(payload["_rev"].(string)), 
-						[]byte(doc))
+			[]byte(payload["_rev"].(string)),
+			[]byte(doc))
 	}
-	
+
 	DOCCreated := &JSONStructs.DocOKResponse{
-		OK: true,
-		ID: payload["_id"].(string),
+		OK:  true,
+		ID:  payload["_id"].(string),
 		REV: payload["_rev"].(string),
 	}
-	
+
 	c.Response().Header().Set("ETag", payload["_rev"].(string))
-	c.Response().Header().Set("Location", "http://get.server.address.or.host.name" + ":" +
-							  GConfig.GoCouchCFG.HTTPd.Port + "/" + db + "/" + 
-							  payload["_id"].(string))
-	c.JSON(http.StatusCreated, DOCCreated)	
+	c.Response().Header().Set("Location", "http://get.server.address.or.host.name"+":"+
+		GConfig.GoCouchCFG.HTTPd.Port+"/"+db+"/"+
+		payload["_id"].(string))
+	c.JSON(http.StatusCreated, DOCCreated)
 	return nil
 }
 
-func dbDeleteHandler(c *echo.Context) error{
+func dbDeleteHandler(c echo.Context) error {
 	db := c.Param("db")
-	rev := c.Query("rev")
-		
-	c.Response().Header().Set(echo.ContentType, echo.ApplicationJSON)
+	rev := c.QueryParam("rev")
+
+	c.Response().Header().Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 	c.Response().Header().Set("Cache-Control", "must-revalidate")
 	c.Response().Header().Set("Server", Internals.ServerMsg)
 	//Check for possible errors 400 and 404
-	if !Contains(ALL_DBS, db){
+	if !Contains(ALL_DBS, db) {
 		//the DB does not exist -> 404
 		DBExists := &JSONStructs.DBErrorResponse{
 			ErrorMsg: "not_found",
-			Reason: "missing",
+			Reason:   "missing",
 		}
 		c.JSON(http.StatusNotFound, DBExists)
 		return nil
 	}
-	
-	if len(rev) > 0 || !ValidDB_Name.MatchString(db){
+
+	if len(rev) > 0 || !ValidDB_Name.MatchString(db) {
 		//the DB name is not valid -> 400
-		
+
 		InvalidDBName := &JSONStructs.DBErrorResponse{
 			ErrorMsg: "bad_reques",
 			Reason: "You tried to DELETE a database with a ?rev= parameter. " +
-			        "Did you mean to DELETE a document instead?",
+				"Did you mean to DELETE a document instead?",
 		}
-		c.JSON(http.StatusBadRequest, InvalidDBName)		
+		c.JSON(http.StatusBadRequest, InvalidDBName)
 		return nil
 	}
-	
+
 	//TODO implement database security so that 401 may be checked also
-	err := Internals.DeleteDB("", db + ".bd")
-	if err != nil{
-		e.Logger().Error("%s", err)
+	err := Internals.DeleteDB("", db+".bd")
+	if err != nil {
+		e.Logger.Error("%s", err)
 	}
 	//Remove also from ALL_DBS
 	all_dbs_init("")
 	DeleteOKResponse := &JSONStructs.OKResponse{
 		OK: true,
-	}	
+	}
 	c.JSON(http.StatusOK, DeleteOKResponse)
 	return nil
 }
 
-
-func dbBackup(c *echo.Context) error{
+func dbBackup(c echo.Context) error {
 	db := c.Param("db")
-	
+
 	//Check the existence of the database -> 404
 	c.Response().Header().Set("Server", Internals.ServerMsg)
 	//Check for possible errors 400 and 404
-	if !Contains(ALL_DBS, db){
-		c.Response().Header().Set(echo.ContentType, echo.ApplicationJSON)
+	if !Contains(ALL_DBS, db) {
+		c.Response().Header().Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 		c.Response().Header().Set("Cache-Control", "must-revalidate")
 		//the DB does not exist -> 404
 		DBExists := &JSONStructs.DBErrorResponse{
 			ErrorMsg: "not_found",
-			Reason: "Missing database file!",
+			Reason:   "Missing database file!",
 		}
 		c.JSON(http.StatusNotFound, DBExists)
 		return nil
-	}	
-	
-	tmp_db := Internals.ROBoltDB("",db+".bd")
+	}
+
+	tmp_db := Internals.ROBoltDB("", db+".bd")
 	defer tmp_db.Close()
-	err := tmp_db.ExportFile(db+".bd", c)
-    if err != nil {
+	err := tmp_db.ExportFile("", db+".bd", c)
+	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
-    }
-	
+	}
+
 	c.Response().Flush()
 	return nil
 }
 
-func dbGetHandler(c *echo.Context) error {
-	c.Response().Header().Set(echo.ContentType, echo.ApplicationJSON)
+func dbGetHandler(c echo.Context) error {
+	c.Response().Header().Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 	c.Response().Header().Set("Cache-Control", "must-revalidate")
 	c.Response().Header().Set("Pragma", "no-cache")
 	c.Response().Header().Set("ETag", "buru-buru")
@@ -311,8 +309,8 @@ func dbGetHandler(c *echo.Context) error {
 	return nil
 }
 
-func all_dbsHandler(c *echo.Context) error {
-	c.Response().Header().Set(echo.ContentType, echo.ApplicationJSON)
+func all_dbsHandler(c echo.Context) error {
+	c.Response().Header().Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 	c.Response().Header().Set("Cache-Control", "must-revalidate")
 	c.Response().Header().Set("Pragma", "no-cache")
 	c.Response().Header().Set("Server", Internals.ServerMsg)
@@ -345,23 +343,22 @@ func main() {
 	e.Use(mw.Recover())
 
 	//Register routes
-	e.Get("/", slashHandler)
-	e.Get("/_uuids", uuidHandler)
-	e.Get("/_all_dbs", all_dbsHandler)
-	
+	e.GET("/", slashHandler)
+	e.GET("/_uuids", uuidHandler)
+	e.GET("/_all_dbs", all_dbsHandler)
+
 	//Database operations
-	e.Head("/:db", dbHeadHandler)
-	e.Get("/:db", dbGetHandler)
-	e.Put("/:db", dbPutHandler)
-	e.Post("/:db", dbPostHandler)
-	e.Delete("/:db", dbDeleteHandler)
+	e.HEAD("/:db", dbHeadHandler)
+	e.GET("/:db", dbGetHandler)
+	e.PUT("/:db", dbPutHandler)
+	e.POST("/:db", dbPostHandler)
+	e.DELETE("/:db", dbDeleteHandler)
 	//_backup
-	e.Get("/_backup/:db",dbBackup)
-	
-	e.Logger().Info("%s", Internals.WelcomeMsg)
+	e.GET("/_backup/:db", dbBackup)
+
+	e.Logger.Info("%s", Internals.WelcomeMsg)
 
 	//Start server
-	e.Run(GConfig.GoCouchCFG.HTTPd.Bind_Address + 
-	      ":" + 
-		  GConfig.GoCouchCFG.HTTPd.Port)
+	e.Logger.Fatal(e.Start(GConfig.GoCouchCFG.HTTPd.Bind_Address +
+		":" + GConfig.GoCouchCFG.HTTPd.Port))
 }

@@ -1,6 +1,7 @@
 :bangbang: This code represents **Work In Progress!** Do not use it in production environment. :bangbang:
 
 # GoCouch
+
 CouchDB implementation in Go. The main target platform is for mobile devices.  
 The name is not final, it represents a concatenation of Go and Couch. We are still thinking to call it Gr0_0uchO DB, and add a mustache on a CouchDB logo. Other names on the list: Recamier, SquaBD, seTTes (a palindromized form of settee and pronounced [si tɪts]), Banquette , all refering to couch in English. The tanslation/equivalent word in other languages: gogol, bedi DB, MoengaDB (just to annoy mongoDB fans), mag-abang DB.  
 This project is not another implementation of CouchDB system. It came as an alternative to existing implementations: PouchDB, CouchBase Lite, TouchDB etc for mobile devices.
@@ -8,6 +9,7 @@ The main purpose is to allow a decent storage mechanism of data on mobile device
 By its nature GoCouchDB runs off-line, stores data in JSON format and exposes a REST API to the application, and most important it syncs.
 
 # 0. Introduction
+
 Get this repository from github:  
 `git clone https://github.com/iqcouch/gocouch.git`
 
@@ -27,32 +29,32 @@ then you are up and running, congratulations!
 If you want develop your own version of this software, please use `./build.sh clean` before commit.
 
 # 1. Development Status
-The following REST API are implemented or on the roadmap:  
-- [x] `GET http://server:5984/ `
-- [x] `GET http://server:5984/_uuids `
-- [x] `GET http://server:5984/_all_dbs `
-- [x] `HEAD http://server:5984/{db} `
-- [x] `GET http://server:5984/{db} ` -- Partially implemented. The statistics is not recorder. It will be fully implemented as part of replication mechanism.
-- [x] `POST http://server:5984/{db} `
-- [x] `PUT http://server:5984/{db} `
-- [x] `DELETE http://server:5984/{db} `
-- [x] `GET http://server:5984/_backup/{db} ` -- This is specific API and allows you to download the associate BoltDB file. Like a full dump of the database.
-- [ ] `POST http://server:5984/_replicate `
-- [ ] `GET http://server:5984/{db}/_local/{doc} `
-- [ ] `POST http://server:5984/{db}/_local/{doc} `
-- [ ] `GET http://server:5984/{db}/_changes `
-- [ ] `POST http://server:5984/{db}/_changes ` 
-- [ ] `POST http://server:5984/{db}/_revs_diff ` 
-- [ ] `GET http://server:5984/{db}/{doc} ` 
-- [ ] `PUT http://server:5984/{db}/{doc} ` 
-- [ ] `POST http://server:5984/{db}/_bulk_docs ` 
-- [ ] `POST http://server:5984/{db}/_ensure_full_commit `  
+
+The following REST API are implemented or on the roadmap:
+
+- [x] `GET http://server:5984/`
+- [x] `GET http://server:5984/_uuids`
+- [x] `GET http://server:5984/_all_dbs`
+- [x] `HEAD http://server:5984/{db}`
+- [x] `GET http://server:5984/{db}` -- Partially implemented. The statistics is not recorder. It will be fully implemented as part of replication mechanism.
+- [x] `POST http://server:5984/{db}`
+- [x] `PUT http://server:5984/{db}`
+- [x] `DELETE http://server:5984/{db}`
+- [x] `GET http://server:5984/_backup/{db}` -- This is specific API and allows you to download the associate BoltDB file. Like a full dump of the database.
+- [ ] `POST http://server:5984/_replicate`
+- [ ] `GET http://server:5984/{db}/_local/{doc}`
+- [ ] `POST http://server:5984/{db}/_local/{doc}`
+- [ ] `GET http://server:5984/{db}/_changes`
+- [ ] `POST http://server:5984/{db}/_changes`
+- [ ] `POST http://server:5984/{db}/_revs_diff`
+- [ ] `GET http://server:5984/{db}/{doc}`
+- [ ] `PUT http://server:5984/{db}/{doc}`
+- [ ] `POST http://server:5984/{db}/_bulk_docs`
+- [ ] `POST http://server:5984/{db}/_ensure_full_commit`
 
 Database log is directed to the console in this moment but this will be changed for production release, it will most probably be directed toward a file or a database. There is a config database `_gcfg.bd`, in a future version it will be an API that will allow configuration management. Attachments are also on the roadmap, both as document attachments and as CouchApps.
 
-
 # Information sources
-
 
 * http://docs.couchdb.org/en/stable/replication/protocol.html
 * https://git-wip-us.apache.org/repos/asf?p=couchdb.git;a=blob;f=src/couch_replicator/src/couch_replicator_utils.erl;h=d7778db;hb=HEAD
