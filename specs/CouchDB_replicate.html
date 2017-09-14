@@ -55,6 +55,9 @@
       Note right of GoCouchDB: Replication request successfully completed     
       GoCouchDB-->>-HTML Client: 200 OK 
   </div>
+  <p>This is the genreal positive case where the full sequence is successfully
+    executed.
+  </p>
   <h3>The algorithm</h3>
   <p>The payload
   <code>
@@ -80,6 +83,20 @@
       PUT /{target_db}/_local/replication_id 
     
   </pre>
+  <div class="mermaid">
+    graph TD
+      id0>POST /_replicate] --> id1(1. Verfiy peers) 
+      id1-->id2(2. Get Peers Information)
+      id2-->id3(3. Find Common Ancestry)
+      id3-->id4(4. Locate Changed Documents)
+      id4-->id5(5. Replicate Changes)
+      id5-->id6{Replication<br/>DONE?}         
+      id6-- YES -->id7{Continuous<br/>Replication?}
+      id7-- NO -->STOP
+      id6-- NO -->id4 
+      id7-- YES -->id4
+  </div>
+
   <p>0. Check the existence of source database</p>
   <div class="mermaid">
       sequenceDiagram

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<diagram program="umlet" version="14.1.1">
+<diagram program="umlet" version="14.2">
   <help_text>// Uncomment the following line to change the fontsize and font:
 fontsize=16
 fontfamily=Monospaced //possible: SansSerif,Serif,Monospaced
@@ -28,15 +28,13 @@ fontfamily=Monospaced //possible: SansSerif,Serif,Monospaced
   <element>
     <type>com.baselet.element.old.allinone.ActivityDiagramText</type>
     <coordinates>
-      <x>56</x>
+      <x>40</x>
       <y>16</y>
-      <w>823</w>
-      <h>767</h>
+      <w>825</w>
+      <h>672</h>
     </coordinates>
     <panel_attributes>title:CouchDB Replication Algorithm
-Start
-Replication \Service \Active
-&gt;POST /_replicate
+&gt;Replication Service Active \\POST /_replicate
 (1) Verify Peers ..
 (2) Get Peers Information ..
 (3) Find Common Ancestry ..

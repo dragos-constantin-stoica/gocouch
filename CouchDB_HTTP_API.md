@@ -1,5 +1,6 @@
 # CouchDB API DOC
 
+
 |    Route                              |      METHOD     |
 |---------------------------------------|-----------------|
 |      /                                |        GET      |
@@ -302,7 +303,7 @@ Server: CouchDB (Erlang/OTP)
 |       /_all_dbs                       |     GET         |
 |  Response ||
 
-```http 
+```http
   HTTP/1.1 200 OK
   Cache-Control: must-revalidate
   Content-Length: 52
