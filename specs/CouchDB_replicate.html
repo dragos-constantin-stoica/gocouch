@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <link rel="stylesheet" href="https://unpkg.com/mermaid@7.0.3/dist/mermaid.min.css">
+  <link rel="stylesheet" href="https://unpkg.com/mermaid@7.1.0/dist/mermaid.min.css">
 </head>
 <body>
   <h1>CouchDB Replicate Protocol Sequence Diagram</h1>
@@ -48,7 +48,7 @@
           The connection is kept alive by periodic heartbeats.
       </dd>
       <dt>Single Replication</dt>
-      <dd>Replication that takes place on time.</dd>
+      <dd>One time Replication of two databases. This is the equivalent of sync operation.</dd>
     </dl>
 
    
@@ -203,7 +203,7 @@
       GoCouchDB-->>-HTML Client: 500 Internal Server Error 
   </div>     
 
-  <script src="https://unpkg.com/mermaid@7.0.3/dist/mermaid.min.js"></script>
+  <script src="https://unpkg.com/mermaid@7.1.0/dist/mermaid.min.js"></script>
   <script>mermaid.initialize({startOnLoad:true});</script>
 </body>
 </html>

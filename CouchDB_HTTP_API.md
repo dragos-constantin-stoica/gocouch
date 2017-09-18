@@ -1,10 +1,26 @@
 # CouchDB API DOC
 
+_Table of Contents_
 
-|    Route                              |      METHOD     |
-|---------------------------------------|-----------------|
-|      /                                |        GET      |
-| Response ||
+[**1. Route** `/`](#1-route)  
+[**2. Route** `/_uuids`](#2-route-uuids)  
+[**3. Route** `/{db}`](#3-route-db)  
+[**4. Route** `/_backup/{db}`](#4-route-backupdb)  
+[**5. Route** `/{db}/{docid}`](#5-route-dbdocid)  
+[**6. Route** `/{db}/{docid}/{attachment}`](#6-route-dbdocidattachment)  
+[**7. Route** `/_replicate`](#7-route-replicate)  
+[**8. Route** `/{db}/_compact`](#8-route-dbcompact)  
+[**9. Route** `/{db}/_purge`](#9-route-dbpurge)  
+[**10. Route** `_all_dbs`](#10-route-alldbs)  
+
+____
+
+
+## 1.  **Route** `/`
+
+**`GET /`**
+
+**Response**
 
 ```http
 HTTP/1.1 200 OK
@@ -25,10 +41,13 @@ Server: CouchDB (Erlang/OTP)
 }
 ```
 
-|    Route                              |      METHOD     |
-|---------------------------------------|-----------------|
-|       /_uuids                         |         GET     |
-|   Response ||
+____
+
+## 2.  **Route** `/_uuids`
+
+**`GET /_uuids`**
+
+**Response**
 
 ```http
 HTTP/1.1 200 OK
@@ -56,10 +75,15 @@ Server: CouchDB (Erlang/OTP)
 }
 ```
 
-|    Route                              |      METHOD     |
-|---------------------------------------|-----------------|
-| /`^[a-z][a-z0-9_$()+/-]*$` <br/> database operations   |     HEAD        |
-| Response  | |
+____
+
+## 3. **Route** /{db}
+
+**`HEAD /^[a-z][a-z0-9_$()+/-]*$`**
+
+Database operations - check existence
+
+**Response**
 
 ```http
  HTTP/1.1 200 OK
@@ -78,10 +102,12 @@ Server: CouchDB (Erlang/OTP)
  Cache-Control: must-revalidate
 ```
 
-|    Route                              |      METHOD     |
-|---------------------------------------|-----------------|
-| /`^[a-z][a-z0-9_$()+/-]*$` <br/> database operations   |     PUT         |
-|	Response ||
+**`PUT /^[a-z][a-z0-9_$()+/-]*$`**
+
+Database operations - creating a database.
+
+**Response**
+
 ```http
  HTTP/1.1 201 Created
  Cache-Control: must-revalidate
@@ -120,10 +146,11 @@ Server: CouchDB (Erlang/OTP)
  }
 ```
 
-|    Route                              |      METHOD     |
-|---------------------------------------|-----------------|
-| /`^[a-z][a-z0-9_$()+/-]*$` <br/> database operations | POST |
-| Response | |
+**`POST /^[a-z][a-z0-9_$()+/-]*$`**
+
+Database operations - create a document with an ID assigned by the database
+
+**Response**
 
 ```http
  HTTP/1.1 201 Created
@@ -178,10 +205,11 @@ Server: CouchDB (Erlang/OTP)
  }
 ```
 
-|    Route                              |      METHOD     |
-|---------------------------------------|-----------------|
-| /`^[a-z][a-z0-9_$()+/-]*$` <br/> database operations |  DELETE      |
-|	Response ||
+**`DELETE /^[a-z][a-z0-9_$()+/-]*$`**
+
+Database operations - delete a database
+
+**Response**
 
 ```http
  HTTP/1.1 200 OK
@@ -220,10 +248,11 @@ Server: CouchDB (Erlang/OTP)
  }
 ```
 
-|    Route                              |      METHOD     |
-|---------------------------------------|-----------------|
-| /`^[a-z][a-z0-9_$()+/-]*$` <br/> database operations |     GET         |
-| Response ||
+**`GET /^[a-z][a-z0-9_$()+/-]*$`**
+
+Database operations - get full information about an existing database
+
+**Response**
 
 ```http
  HTTP/1.1 200 OK
@@ -248,10 +277,15 @@ Server: CouchDB (Erlang/OTP)
  }
 ```
 
-|    Route                              |      METHOD     |
-|---------------------------------------|-----------------|
-|    /_backup/`^[a-z][a-z0-9_$()+/-]*$` <br/> database backup | GET |
-| Response ||
+____
+
+## 4. **Route** `/_backup/{db}`
+
+**`GET /_backup/^[a-z][a-z0-9_$()+/-]*$`**
+
+Get the database file - a physical backup.
+
+**Response**
 
 ```http
  HTTP/1.1 200 OK
@@ -277,31 +311,137 @@ Server: CouchDB (Erlang/OTP)
  }
 ```
 
-|    Route                              |      METHOD     |
-|---------------------------------------|-----------------|
-|      /{db}/{docid} <br/> document operations, no attachments |     HEAD      <br/> GET <br/>  PUT <br/> DELETE      |
+## 5. **Route** `/{db}/{docid}`
 
-|    Route                              |      METHOD     |
-|---------------------------------------|-----------------|
-|      /{db}/{docid}/{attachment} <br/>	document attachments only | HEAD <br/>   GET  <br/> PUT <br/> DELETE      |
+Document operations, no attachments
 
-|    Route                              |      METHOD     |
-|---------------------------------------|-----------------|
-|        /_replicate <br/>  see official documentation!!!                 |     POST        |
+**`HEAD /{db}/{docid}`**
 
-|    Route                              |      METHOD     |
-|---------------------------------------|-----------------|
-|        /{db}/_compact                 |     POST        |
+Document operations - get basic information about the document if it exists.
 
-|    Route                              |      METHOD     |
-|---------------------------------------|-----------------|
-|       /{db}/_purge                    |     POST        |
-|                                       |                 |
+**Response**
 
-|    Route                              |      METHOD     |
-|---------------------------------------|-----------------|
-|       /_all_dbs                       |     GET         |
-|  Response ||
+```http
+TODO
+
+```
+
+**`GET /{db}/{docid}`**
+
+Document operations - get full document, without attachments
+
+**Response**
+
+```http
+TODO
+
+```
+
+
+**`PUT /{db}/{docid}`**
+
+Document operations - create a new document with the given ID
+
+**Response**
+
+```http
+TODO
+
+```
+
+**`DELETE /{db}/{docid}`**
+
+Document operations - delete a document with ID and REV
+
+**Response**
+
+```http
+TODO
+
+```
+
+## 6. **Route** `/{db}/{docid}/{attachment}`
+
+**`HEAD  /{db}/{docid}/{attachment}`**
+
+
+**Response**
+
+```http
+TODO
+
+```
+
+
+
+**`GET  /{db}/{docid}/{attachment}`**
+
+
+**Response**
+
+```http
+TODO
+
+```
+
+
+**`PUT  /{db}/{docid}/{attachment}`**
+
+**Response**
+
+```http
+TODO
+
+```
+
+**`DELETE  /{db}/{docid}/{attachment}`**
+
+
+**Response**
+
+```http
+TODO
+
+```
+
+## 7. **Route** `/_replicate`
+
+**`POST /_replicate`**
+
+**Response**
+
+```http
+TODO
+
+```
+
+## 8. **Route** `/{db}/_compact`
+
+**`POST /{db}/_compact`**
+
+**Response**
+
+```http
+TODO
+
+```
+
+## 9. **Route** `/{db}/_purge`
+
+**`POST /{db}/_purge`**
+
+**Response**
+
+```http
+TODO
+
+```
+
+## 10. **Route** `_all_dbs`
+
+**`GET /_add_dbs`**
+
+**Response**
 
 ```http
   HTTP/1.1 200 OK
@@ -319,3 +459,5 @@ Server: CouchDB (Erlang/OTP)
    "locations"
   ]
 ```
+
+____
